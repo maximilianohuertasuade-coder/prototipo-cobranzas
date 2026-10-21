@@ -11,6 +11,7 @@ Este documento contiene el registro de las entrevistas cualitativas realizadas a
 * **Cargo/Rol en la administración:** Administradora de Consorcio
 * **Administración / Empresa:** Consorcio San Juan (Av. San Juan 1896)
 * **Cantidad de unidades gestionadas:** 36 unidades
+* **Teléfono:** +54 9 11 6359-4365
 * **Fecha de realización:** 15/09/2026
 
 ### PREGUNTAS DE INVESTIGACIÓN
@@ -60,6 +61,8 @@ Este documento contiene el registro de las entrevistas cualitativas realizadas a
 * **Nombre de la Administración / Institución:** ByG Consorcios
 * **Nombre del Entrevistado:** Verónica Gindre
 * **Cargo / Rol:** Administradora
+* **Teléfono:** +54 9 11 3848-5023
+* **Correo electrónico:** bygconsorcios@gmail.com
 * **Fecha de la Entrevista:** 09/10/2026
 
 ### Contexto de la Entrevista y del Proyecto
