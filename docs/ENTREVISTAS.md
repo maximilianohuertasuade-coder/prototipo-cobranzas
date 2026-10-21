@@ -145,3 +145,61 @@ El objetivo principal de este espacio es comprender el funcionamiento real del �
   * **Clasificación por Gravedad y Alertas Tempranas:** Requerimiento clave para priorizar derivaciones urgentes al personal humano.
   * **Reporte Diario Consolidado:** Necesidad de un resumen diario automático con el historial de interacciones y reclamos atendidos.
   * **Métrica Detallada de Deuda:** El panel de control debe discriminar estrictamente entre capital, intereses, expensas ordinarias y extraordinarias, e indicar si la unidad tiene un plan de pagos activo previamente.
+
+---
+
+## Entrevista 3: Institución Educativa (validación de un vertical distinto)
+
+**DATOS Y VALIDACIÓN DEL ENTREVISTADO**
+* **Institución:** Instituto Rosa Anchorena de Ibáñez (A-133)
+* **Contacto:** María Florencia Darosniski — Directora
+* **Correo electrónico:** rosaanchorena@yahoo.com.ar
+* **Fecha del contacto:** 13/10/2026
+* **Modalidad:** Consulta cualitativa por correo electrónico.
+
+### Contexto y nota metodológica
+
+Esta entrevista permite validar que el problema de la cobranza de cuotas y la
+morosidad no es exclusivo de los consorcios, sino que también aplica a las
+instituciones educativas (cuotas escolares), ampliando el mercado potencial del
+proyecto.
+
+En un primer contacto, la institución declinó participar por tratarse de
+información sensible y confidencial:
+
+> "Estimado, los datos solicitados son información sensible y confidencial de
+> nuestro ámbito privado con lo cual no podremos dar respuesta a sus preguntas.
+> Atte. Equipo de conducción — Instituto Rosa Anchorena de Ibáñez A-133"
+
+Respetando esa decisión, se **reformuló la consulta** para no solicitar ningún dato
+ni cifra interna, pidiendo únicamente una opinión general del sector sobre tres
+puntos clave. Ante este nuevo enfoque, la institución accedió a responder.
+
+### Desarrollo de la Entrevista
+
+**1. Atención a las familias: ¿los padres prefieren resolver cuestiones administrativas por WhatsApp antes que por mail o de forma presencial?**
+> "Sí, la preferencia por WhatsApp es total. Los padres buscan inmediatez y casi no
+> usan el mail. Para nosotros el desafío es que el chat suele restar formalidad, por
+> lo que cuesta dejar asentados los compromisos de pago de manera clara."
+
+**2. Criterios de negociación: frente a situaciones económicas difíciles de las familias, ¿la evaluación personalizada es indispensable frente a pautas rígidas?**
+> "La evaluación personalizada es clave. Tratándose de la educación de los chicos, no
+> podemos como institución aplicar un criterio rígido. Atrás de una mora suele haber
+> un problema familiar o económico puntual, y la idea es siempre buscar una
+> alternativa viable para ambas partes sin perder a la familia."
+
+**3. Asistencia con IA: ante un sistema que conversa por WhatsApp pero donde la administración aprueba cada acuerdo final, ¿cuál es el mayor reparo o temor que puede surgir?**
+> "El principal recaudo es el tono. Nos da temor que el trato resulte frío, robótico o
+> impersonal, porque es un tema sensible. Por más que la administración apruebe el
+> acuerdo final, nos preocupa cómo se gestiona la conversación previa para que el
+> tutor no se sienta agredido o mal atendido."
+
+---
+
+### Análisis de la Entrevista
+
+* **Ampliación del mercado (nuevo vertical):** La cobranza de cuotas con morosidad es un dolor compartido por las instituciones educativas, no solo por los consorcios. Esto abre una oportunidad de expansión del producto a un segmento adicional con dinámicas muy similares.
+* **Validación del Canal:** Se confirma, una vez más, que WhatsApp es el canal dominante ("la preferencia es total") y que el mail prácticamente no se usa. Refuerza la decisión de centrar el producto en WhatsApp.
+* **Dolor Operativo — Formalidad del registro:** Surge un problema nuevo y específico: el chat resta formalidad y dificulta dejar asentados los compromisos de pago. Esto valida fuertemente una función central de pacta.ia: registrar cada pre-acuerdo con trazabilidad (código de referencia, fecha, responsable), convirtiendo una conversación informal en un acuerdo documentado.
+* **Validación del Enfoque "Human-in-the-Loop":** Se reafirma la necesidad de evaluación personalizada y de que un humano apruebe cada acuerdo. El criterio rígido no es viable en contextos sensibles; el sistema debe proponer dentro de reglas, pero habilitar la revisión humana.
+* **Insight crítico para el producto — El TONO del agente:** El mayor temor no es la automatización en sí, sino que el trato resulte frío o impersonal en un tema sensible. Esto es un requerimiento de diseño clave para el prompt del agente de IA: debe ser empático, cuidado y humano en su redacción, especialmente en las etapas previas a que intervenga una persona.
