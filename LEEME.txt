@@ -1,0 +1,65 @@
+============================================================
+  pacta.ia  -  Como abrir la aplicacion
+============================================================
+
+Esta carpeta NO incluye la carpeta "node_modules" (las librerias)
+para que sea liviana y facil de copiar. Se instala sola la primera
+vez. Segui estos pasos.
+
+------------------------------------------------------------
+PASO 1 - Instalar los programas necesarios (solo una vez por PC)
+------------------------------------------------------------
+
+Esta computadora necesita tener instalado:
+
+  1) Node.js (version LTS)
+     Descargar de: https://nodejs.org
+     (Elegir la opcion "LTS" y darle siguiente a todo)
+
+  2) pnpm (gestor de paquetes)
+     Despues de instalar Node, abrir una ventana de comandos
+     (buscar "cmd" en el menu de inicio) y escribir:
+
+         npm install -g pnpm
+
+     Presionar Enter y esperar a que termine.
+
+  >> Si esta computadora ya tiene Node.js y pnpm, salteá este paso.
+
+------------------------------------------------------------
+PASO 2 - Abrir la aplicacion
+------------------------------------------------------------
+
+  - Hacer DOBLE CLIC en el archivo:  abrir-app.bat
+
+  - La primera vez va a instalar las librerias automaticamente
+    (puede tardar unos minutos, hay que tener internet).
+
+  - Cuando este listo, se abre solo el navegador en:
+        http://localhost:3000
+
+------------------------------------------------------------
+IMPORTANTE
+------------------------------------------------------------
+
+  - Mientras uses la app, DEJA ABIERTA (o minimizada) la ventana
+    negra que aparece. Si la cerras, la app deja de funcionar.
+
+  - Para CERRAR la app: cerra esa ventana negra (o Ctrl + C).
+
+  - Para volver a abrirla otro dia: doble clic en abrir-app.bat
+    (ya no vuelve a instalar nada, abre directo).
+
+------------------------------------------------------------
+QUE ES ESTA APP
+------------------------------------------------------------
+
+  pacta.ia es un asistente de cobranzas para administradoras de
+  consorcios. Permite ver el dashboard de cada edificio, las
+  conversaciones del agente de IA con los propietarios, aceptar o
+  rechazar acuerdos, imprimir comprobantes y configurar politicas.
+
+  (Nota: es un prototipo con datos de ejemplo. Los datos se
+   reinician al recargar la pagina.)
+
+============================================================
