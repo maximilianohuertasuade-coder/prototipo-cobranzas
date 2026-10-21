@@ -148,7 +148,7 @@ El objetivo principal de este espacio es comprender el funcionamiento real del �
 
 ---
 
-## Entrevista 3: Institución Educativa (validación de un vertical distinto)
+## Entrevista 3: Institución Educativa (cuotas escolares)
 
 **DATOS Y VALIDACIÓN DEL ENTREVISTADO**
 * **Institución:** Instituto Rosa Anchorena de Ibáñez (A-133)
@@ -157,12 +157,17 @@ El objetivo principal de este espacio es comprender el funcionamiento real del �
 * **Fecha del contacto:** 13/10/2026
 * **Modalidad:** Consulta cualitativa por correo electrónico.
 
-### Contexto y nota metodológica
+### Contexto de la Entrevista y del Proyecto
 
-Esta entrevista permite validar que el problema de la cobranza de cuotas y la
-morosidad no es exclusivo de los consorcios, sino que también aplica a las
-instituciones educativas (cuotas escolares), ampliando el mercado potencial del
-proyecto.
+El proyecto pacta.ia está concebido para gestionar la morosidad en dos ámbitos: la
+cobranza de expensas en consorcios y la cobranza de cuotas en instituciones
+educativas. Ambos comparten el mismo problema de fondo (seguimiento de deudores,
+negociación de planes de pago y registro formal de acuerdos) y la misma propuesta de
+un asistente de IA integrado a WhatsApp bajo un esquema "humano en el circuito".
+
+Esta entrevista corresponde al ámbito educativo y aporta la visión de una
+institución escolar sobre la comunicación con las familias, los criterios de
+negociación y la percepción de la asistencia con IA.
 
 En un primer contacto, la institución declinó participar por tratarse de
 información sensible y confidencial:
@@ -198,8 +203,8 @@ puntos clave. Ante este nuevo enfoque, la institución accedió a responder.
 
 ### Análisis de la Entrevista
 
-* **Ampliación del mercado (nuevo vertical):** La cobranza de cuotas con morosidad es un dolor compartido por las instituciones educativas, no solo por los consorcios. Esto abre una oportunidad de expansión del producto a un segmento adicional con dinámicas muy similares.
-* **Validación del Canal:** Se confirma, una vez más, que WhatsApp es el canal dominante ("la preferencia es total") y que el mail prácticamente no se usa. Refuerza la decisión de centrar el producto en WhatsApp.
-* **Dolor Operativo — Formalidad del registro:** Surge un problema nuevo y específico: el chat resta formalidad y dificulta dejar asentados los compromisos de pago. Esto valida fuertemente una función central de pacta.ia: registrar cada pre-acuerdo con trazabilidad (código de referencia, fecha, responsable), convirtiendo una conversación informal en un acuerdo documentado.
+* **Validación del Ámbito Educativo:** La entrevista confirma que el problema de cobranza y morosidad, y la lógica de negociación de planes de pago, aplican plenamente a las instituciones educativas. Esto valida que el ámbito de cuotas escolares forma parte del alcance del proyecto y comparte las mismas necesidades que el de consorcios.
+* **Validación del Canal:** Se confirma, una vez más, que WhatsApp es el canal dominante ("la preferencia es total") y que el mail prácticamente no se usa. Refuerza la decisión de centrar el producto en WhatsApp en ambos ámbitos.
+* **Dolor Operativo — Formalidad del registro:** Se menciona un problema concreto: el chat resta formalidad y dificulta dejar asentados los compromisos de pago. Esto valida una función central de pacta.ia: registrar cada pre-acuerdo con trazabilidad (código de referencia, fecha, responsable), convirtiendo una conversación informal en un acuerdo documentado.
 * **Validación del Enfoque "Human-in-the-Loop":** Se reafirma la necesidad de evaluación personalizada y de que un humano apruebe cada acuerdo. El criterio rígido no es viable en contextos sensibles; el sistema debe proponer dentro de reglas, pero habilitar la revisión humana.
 * **Insight crítico para el producto — El TONO del agente:** El mayor temor no es la automatización en sí, sino que el trato resulte frío o impersonal en un tema sensible. Esto es un requerimiento de diseño clave para el prompt del agente de IA: debe ser empático, cuidado y humano en su redacción, especialmente en las etapas previas a que intervenga una persona.
