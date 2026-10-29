@@ -46,8 +46,13 @@ const toneClasses: Record<string, string> = {
 type Row = { owner: Owner; conv: Conversation | undefined }
 
 function DeudoresPage() {
-  const { selectedBuilding, isAllBuildings, buildingIdOfConversation } =
+  const { selectedBuilding, isAllBuildings, buildingIdOfConversation, labels } =
     useAppStore()
+  const debtorCap =
+    labels.debtor.charAt(0).toUpperCase() + labels.debtor.slice(1)
+  const debtorPluralCap =
+    labels.debtorPlural.charAt(0).toUpperCase() + labels.debtorPlural.slice(1)
+  const unitCap = labels.unit.charAt(0).toUpperCase() + labels.unit.slice(1)
   const [query, setQuery] = useState("")
   const [selected, setSelected] = useState<Row | null>(null)
 
@@ -76,9 +81,11 @@ function DeudoresPage() {
     <AppShell title="Deudores">
       <Card>
         <CardHeader className="border-b">
-          <CardTitle>Propietarios con deuda · {selectedBuilding.name}</CardTitle>
+          <CardTitle>
+            {debtorPluralCap} con deuda · {selectedBuilding.name}
+          </CardTitle>
           <CardDescription>
-            {selectedBuilding.owners.length} propietarios · deuda total{" "}
+            {selectedBuilding.owners.length} {labels.debtorPlural} · deuda total{" "}
             {formatCurrency(totalDebt)}
           </CardDescription>
         </CardHeader>
@@ -92,7 +99,7 @@ function DeudoresPage() {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar propietario, unidad o teléfono"
+              placeholder={`Buscar ${labels.debtor}, ${labels.unit} o teléfono`}
               className="h-9 pl-8"
             />
           </div>
@@ -101,8 +108,8 @@ function DeudoresPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-xs text-muted-foreground">
-                  <th className="py-2 pr-3 font-medium">Propietario</th>
-                  <th className="py-2 pr-3 font-medium">Unidad</th>
+                  <th className="py-2 pr-3 font-medium">{debtorCap}</th>
+                  <th className="py-2 pr-3 font-medium">{unitCap}</th>
                   <th className="py-2 pr-3 font-medium">Teléfono</th>
                   <th className="py-2 pr-3 text-right font-medium">Deuda</th>
                   <th className="py-2 pr-3 font-medium">Mora</th>
@@ -159,7 +166,7 @@ function DeudoresPage() {
             </table>
             {rows.length === 0 && (
               <p className="py-8 text-center text-sm text-muted-foreground">
-                No se encontraron propietarios.
+                No se encontraron {labels.debtorPlural}.
               </p>
             )}
           </div>

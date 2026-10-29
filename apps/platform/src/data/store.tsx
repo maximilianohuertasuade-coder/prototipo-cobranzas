@@ -1,7 +1,19 @@
 import * as React from "react"
 
 import { buildings as seedBuildings } from "./conversations"
-import { defaultGlobalPolicy } from "./policies"
+import { schools as seedSchools } from "./schools"
+import { agencies as seedAgencies } from "./realestate"
+import {
+  defaultGlobalPolicy,
+  defaultSchoolPolicy,
+  defaultRealEstatePolicy,
+} from "./policies"
+import {
+  SECTOR_STORAGE_KEY,
+  labelsFor,
+  type Sector,
+  type SectorLabels,
+} from "./sector"
 import type {
   AgreementStatus,
   Building,
@@ -38,7 +50,7 @@ function nowTime() {
 }
 
 /** Construye un "edificio virtual" que consolida todos los edificios. */
-function buildAggregate(buildings: Building[]): Building {
+function buildAggregate(buildings: Building[], allLabel: string): Building {
   const sum = (fn: (b: Building) => number) =>
     buildings.reduce((acc, b) => acc + fn(b), 0)
 
@@ -99,8 +111,8 @@ function buildAggregate(buildings: Building[]): Building {
 
   return {
     id: ALL_BUILDINGS,
-    name: "Todos los edificios",
-    address: `${buildings.length} edificios · ${units} unidades`,
+    name: allLabel,
+    address: `${buildings.length} · ${units}`,
     units,
     usesGlobalPolicy: true,
     policy: defaultGlobalPolicy,
@@ -111,6 +123,10 @@ function buildAggregate(buildings: Building[]): Building {
 }
 
 type AppStore = {
+  sector: Sector
+  setSector: (sector: Sector) => void
+  labels: SectorLabels
+
   buildings: Building[]
   selectedBuildingId: string
   selectedBuilding: Building
@@ -156,12 +172,65 @@ type AppStore = {
 
 const AppStoreContext = React.createContext<AppStore | null>(null)
 
+function readStoredSector(): Sector {
+  if (typeof window === "undefined") return "consorcios"
+  const stored = window.localStorage.getItem(SECTOR_STORAGE_KEY)
+  if (stored === "educativo" || stored === "inmobiliarias") return stored
+  return "consorcios"
+}
+
+/** Clona los datos semilla para no mutar los módulos originales al cambiar de rubro. */
+function seedFor(sector: Sector): Building[] {
+  const source =
+    sector === "educativo"
+      ? seedSchools
+      : sector === "inmobiliarias"
+        ? seedAgencies
+        : seedBuildings
+  return source.map((b) => ({ ...b }))
+}
+
+/** Política por defecto según el rubro. */
+function policyFor(sector: Sector): CollectionPolicy {
+  if (sector === "educativo") return defaultSchoolPolicy
+  if (sector === "inmobiliarias") return defaultRealEstatePolicy
+  return defaultGlobalPolicy
+}
+
 export function AppStoreProvider({ children }: { children: React.ReactNode }) {
+  const [sector, setSectorState] = React.useState<Sector>("consorcios")
   const [buildings, setBuildings] = React.useState<Building[]>(seedBuildings)
   const [selectedBuildingId, setSelectedBuildingId] =
     React.useState<string>(ALL_BUILDINGS)
   const [globalPolicy, setGlobalPolicy] =
     React.useState<CollectionPolicy>(defaultGlobalPolicy)
+
+  const labels = React.useMemo(() => labelsFor(sector), [sector])
+
+  const applySector = React.useCallback((next: Sector) => {
+    setSectorState(next)
+    setBuildings(seedFor(next))
+    setSelectedBuildingId(ALL_BUILDINGS)
+    setGlobalPolicy(policyFor(next))
+  }, [])
+
+  const setSector = React.useCallback(
+    (next: Sector) => {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(SECTOR_STORAGE_KEY, next)
+      }
+      applySector(next)
+    },
+    [applySector]
+  )
+
+  // Al montar en el cliente, sincroniza el rubro guardado (resuelve el SSR).
+  React.useEffect(() => {
+    const stored = readStoredSector()
+    if (stored !== sector) applySector(stored)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const [confirmedAgreements, setConfirmedAgreements] = React.useState<
     ConfirmedAgreement[]
   >([])
@@ -171,7 +240,10 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
 
   const isAllBuildings = selectedBuildingId === ALL_BUILDINGS
 
-  const aggregate = React.useMemo(() => buildAggregate(buildings), [buildings])
+  const aggregate = React.useMemo(
+    () => buildAggregate(buildings, labels.allEntities),
+    [buildings, labels.allEntities]
+  )
 
   const selectedBuilding = React.useMemo(
     () =>
@@ -340,6 +412,9 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
 
   const value = React.useMemo<AppStore>(
     () => ({
+      sector,
+      setSector,
+      labels,
       buildings,
       selectedBuildingId,
       selectedBuilding,
@@ -360,6 +435,9 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       setConversationOutcome,
     }),
     [
+      sector,
+      setSector,
+      labels,
       buildings,
       selectedBuildingId,
       selectedBuilding,

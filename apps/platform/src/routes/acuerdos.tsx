@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { createFileRoute } from "@tanstack/react-router"
 import { Link } from "@tanstack/react-router"
 import {
@@ -18,6 +18,13 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
 import { useAppStore } from "@/data/store"
 import { formatCurrency, formatDateTime } from "@/data/format"
 import type { Agreement, Building } from "@/data/types"
@@ -75,7 +82,9 @@ function groupFromBuilding(building: Building): Group {
 }
 
 function AgreementsPage() {
-  const { buildings, isAllBuildings, selectedBuildingId } = useAppStore()
+  const { buildings, isAllBuildings, selectedBuildingId, labels } =
+    useAppStore()
+  const [selected, setSelected] = useState<Row | null>(null)
 
   const groups = useMemo<Group[]>(() => {
     const source = isAllBuildings
@@ -94,6 +103,10 @@ function AgreementsPage() {
   const pendientes = allRows.filter(
     (r) => r.agreement.status === "propuesto"
   ).length
+  // Monto recuperado = solo acuerdos aceptados (coincide con el dashboard).
+  const totalRecuperado = allRows
+    .filter((r) => r.agreement.status === "aceptado")
+    .reduce((s, r) => s + r.agreement.totalToPay, 0)
 
   function exportCsv() {
     const header = [
@@ -197,17 +210,20 @@ function AgreementsPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Monto total acordado</CardDescription>
+            <CardDescription>Monto recuperado (confirmado)</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold tabular-nums">
-              {formatCurrency(totalMes)}
+              {formatCurrency(totalRecuperado)}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Total acordado: {formatCurrency(totalMes)}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Edificios con acuerdos</CardDescription>
+            <CardDescription>Con acuerdos</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">{groups.length}</p>
@@ -228,15 +244,32 @@ function AgreementsPage() {
       ) : (
         <div className="space-y-6">
           {groups.map((group) => (
-            <BuildingGroup key={group.buildingId} group={group} />
+            <BuildingGroup
+              key={group.buildingId}
+              group={group}
+              onSelect={setSelected}
+            />
           ))}
         </div>
       )}
+
+      <AgreementDetailSheet
+        row={selected}
+        onClose={() => setSelected(null)}
+        debtorLabel={labels.debtor}
+        unitLabel={labels.unit}
+      />
     </AppShell>
   )
 }
 
-function BuildingGroup({ group }: { group: Group }) {
+function BuildingGroup({
+  group,
+  onSelect,
+}: {
+  group: Group
+  onSelect: (row: Row) => void
+}) {
   return (
     <section className="break-inside-avoid">
       <div className="mb-2 flex items-center gap-2">
@@ -270,7 +303,11 @@ function BuildingGroup({ group }: { group: Group }) {
             </thead>
             <tbody className="divide-y">
               {group.rows.map((r) => (
-                <AgreementRow key={r.agreement.id} row={r} />
+                <AgreementRow
+                  key={r.agreement.id}
+                  row={r}
+                  onSelect={onSelect}
+                />
               ))}
             </tbody>
           </table>
@@ -316,10 +353,19 @@ function StatusBadge({ status }: { status: Agreement["status"] }) {
   )
 }
 
-function AgreementRow({ row }: { row: Row }) {
+function AgreementRow({
+  row,
+  onSelect,
+}: {
+  row: Row
+  onSelect: (row: Row) => void
+}) {
   const a = row.agreement
   return (
-    <tr className="hover:bg-muted/40">
+    <tr
+      className="cursor-pointer hover:bg-muted/40"
+      onClick={() => onSelect(row)}
+    >
       <td className="px-4 py-2.5 font-medium">{a.reference}</td>
       <td className="px-4 py-2.5">
         <p className="font-medium">{row.ownerName}</p>
@@ -349,10 +395,137 @@ function AgreementRow({ row }: { row: Row }) {
           to="/conversaciones"
           search={{ open: row.conversationId }}
           className="text-xs font-medium text-primary hover:underline"
+          onClick={(e) => e.stopPropagation()}
         >
           Ver chat
         </Link>
       </td>
     </tr>
+  )
+}
+
+function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-4 py-2 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="text-right font-medium">{value}</span>
+    </div>
+  )
+}
+
+function AgreementDetailSheet({
+  row,
+  onClose,
+  debtorLabel,
+  unitLabel,
+}: {
+  row: Row | null
+  onClose: () => void
+  debtorLabel: string
+  unitLabel: string
+}) {
+  const a = row?.agreement
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
+  return (
+    <Sheet open={row !== null} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+        {row && a && (
+          <>
+            <SheetHeader>
+              <SheetTitle>Acuerdo {a.reference}</SheetTitle>
+              <SheetDescription>
+                Detalle del acuerdo de pago registrado por el agente.
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="mt-2 px-4 pb-6">
+              <div className="mb-4">
+                <StatusBadge status={a.status} />
+              </div>
+
+              <div className="divide-y rounded-lg border px-3">
+                <DetailRow label={cap(debtorLabel)} value={row.ownerName} />
+                <DetailRow label="Teléfono" value={row.ownerPhone} />
+                <DetailRow label={cap(unitLabel)} value={row.unit} />
+              </div>
+
+              <p className="mt-5 mb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                Plan de pago
+              </p>
+              <div className="divide-y rounded-lg border px-3">
+                <DetailRow
+                  label="Deuda original"
+                  value={formatCurrency(a.originalDebt)}
+                />
+                <DetailRow
+                  label="Quita de intereses"
+                  value={`${a.interestWaiver} %`}
+                />
+                <DetailRow
+                  label="Cuotas"
+                  value={`${a.installments} de ${formatCurrency(a.installmentAmount)}`}
+                />
+                <DetailRow
+                  label="Vencimiento"
+                  value={`Día ${a.dueDay} de cada mes`}
+                />
+                <DetailRow
+                  label="Total a pagar"
+                  value={
+                    <span className="text-base">
+                      {formatCurrency(a.totalToPay)}
+                    </span>
+                  }
+                />
+              </div>
+
+              <p className="mt-5 mb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                Trazabilidad
+              </p>
+              <div className="divide-y rounded-lg border px-3">
+                <DetailRow
+                  label="Propuesto"
+                  value={formatDateTime(a.proposedAt)}
+                />
+                {a.resolvedAt && (
+                  <DetailRow
+                    label="Resuelto"
+                    value={formatDateTime(a.resolvedAt)}
+                  />
+                )}
+                <DetailRow label="Resuelto por" value={a.resolvedBy ?? "—"} />
+                {a.status === "rechazado" && a.rejectionReason && (
+                  <DetailRow
+                    label="Motivo de rechazo"
+                    value={
+                      <span className="text-destructive">
+                        {a.rejectionReason}
+                      </span>
+                    }
+                  />
+                )}
+              </div>
+
+              <div className="mt-6">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  nativeButton={false}
+                  render={
+                    <Link
+                      to="/conversaciones"
+                      search={{ open: row.conversationId }}
+                    />
+                  }
+                >
+                  Ver conversación completa
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
   )
 }

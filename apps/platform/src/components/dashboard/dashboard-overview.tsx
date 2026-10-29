@@ -50,17 +50,28 @@ export function DashboardOverview({
   const b = selectedBuilding
   const m = metricsForPeriod(b.metrics, period)
 
+  // Monto recuperado y acuerdos cerrados se calculan de los acuerdos REALES
+  // aceptados, para que el dashboard coincida con la pantalla de Acuerdos.
+  const acceptedAgreements = b.conversations
+    .map((c) => c.agreement)
+    .filter((a) => a && a.status === "aceptado")
+  const recoveredReal = acceptedAgreements.reduce(
+    (s, a) => s + (a?.totalToPay ?? 0),
+    0
+  )
+  const agreementsClosedReal = acceptedAgreements.length
+
   const metrics = [
     {
       label: "Monto recuperado",
-      value: formatCompactCurrency(m.recovered),
+      value: formatCompactCurrency(recoveredReal),
       detail: `${m.recoveredChange >= 0 ? "+" : ""}${m.recoveredChange.toLocaleString("es-AR", { maximumFractionDigits: 1 })}% ${compareLabel[period]}`,
       positive: m.recoveredChange >= 0,
       icon: MoneyReceiveCircleIcon,
     },
     {
       label: "Acuerdos cerrados",
-      value: String(m.agreementsClosed),
+      value: String(agreementsClosedReal),
       detail: `${m.agreementsThisWeek} esta semana`,
       positive: true,
       icon: CheckmarkCircle02Icon,

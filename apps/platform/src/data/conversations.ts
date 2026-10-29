@@ -41,19 +41,25 @@ type Guion = {
 
 let agreementSeq = 1000
 
-/** Construye un acuerdo propuesto con todos los datos para trazabilidad. */
+/** Construye un acuerdo con todos los datos para trazabilidad.
+ *  Admite un estado opcional (propuesto/aceptado/rechazado) para poder
+ *  cargar datos de ejemplo con acuerdos ya cerrados. */
 export function buildAgreement(ctx: {
   debt: number
   maxInstallments: number
   interestWaiver: number
   dueDay: number
+  status?: "propuesto" | "aceptado" | "rechazado"
+  resolvedBy?: string
+  rejectionReason?: string
 }): Agreement {
   const totalToPay = Math.round(ctx.debt * (1 - ctx.interestWaiver / 100))
   const installmentAmount = Math.round(totalToPay / ctx.maxInstallments)
   agreementSeq += 1
+  const status = ctx.status ?? "propuesto"
   return {
     id: `agr-${agreementSeq}`,
-    status: "propuesto",
+    status,
     originalDebt: ctx.debt,
     interestWaiver: ctx.interestWaiver,
     installments: ctx.maxInstallments,
@@ -61,6 +67,10 @@ export function buildAgreement(ctx: {
     totalToPay,
     dueDay: ctx.dueDay,
     proposedAt: new Date().toISOString(),
+    resolvedAt: status === "propuesto" ? undefined : new Date().toISOString(),
+    resolvedBy: status === "propuesto" ? undefined : ctx.resolvedBy,
+    rejectionReason:
+      status === "rechazado" ? ctx.rejectionReason : undefined,
     reference: `PAC-${agreementSeq}`,
   }
 }
@@ -215,11 +225,72 @@ const guiones: Guion[] = [
   },
 ]
 
+// Relleno de propietarios para que cada edificio tenga suficientes acuerdos.
+const FILLER_NAMES: [string, string][] = [
+  ["Agustina", "Rendón"],
+  ["Lucas", "Brizuela"],
+  ["Mariana", "Ferraro"],
+  ["Pablo", "Ledesma"],
+  ["Carolina", "Nieto"],
+  ["Diego", "Arce"],
+  ["Sofía", "Villalba"],
+  ["Hernán", "Peralta"],
+  ["Natalia", "Coria"],
+  ["Esteban", "Luengo"],
+  ["Paula", "Mercado"],
+  ["Facundo", "Ávalos"],
+]
+
+const MIN_OWNERS = 11
+
+function fillOwners() {
+  buildings.forEach((building, bIdx) => {
+    let n = 0
+    while (building.owners.length < MIN_OWNERS) {
+      const [firstName, lastName] = FILLER_NAMES[(bIdx * 5 + n) % FILLER_NAMES.length]
+      const floor = 1 + ((bIdx + n) % 10)
+      const letter = String.fromCharCode(65 + (n % 4)) // A-D
+      const debt = 70_000 + (((bIdx * 7 + n * 53) % 26) * 9_000)
+      building.owners.push({
+        id: `${building.id}-f${n}`,
+        firstName,
+        lastName,
+        phone: `+54 9 11 ${String(20000000 + bIdx * 100000 + n * 1111).slice(0, 4)}-${String(20000000 + bIdx * 100000 + n * 1111).slice(4)}`,
+        unit: `${floor}${letter}`,
+        debt,
+        overdueMonths: 1 + (n % 4),
+      })
+      n += 1
+    }
+  })
+}
+
+fillOwners()
+
 /** Construye todas las conversaciones de cada edificio a partir de sus propietarios. */
 function buildConversations() {
   for (const building of buildings) {
     const convs: Conversation[] = building.owners.map((owner, index) => {
       const guion = guiones[index % guiones.length]
+      // Casi todos los propietarios tienen un acuerdo para que la vista de
+      // Acuerdos sea coherente con el dashboard.
+      const status: "propuesto" | "aceptado" | "rechazado" =
+        index === 0 ? "propuesto" : index % 4 === 3 ? "rechazado" : "aceptado"
+      const agreement =
+        guion.outcome === "en_curso" && index !== 0
+          ? undefined
+          : buildAgreement({
+              debt: owner.debt,
+              maxInstallments: building.policy.maxInstallments,
+              interestWaiver: building.policy.interestWaiver,
+              dueDay: building.policy.dueDay,
+              status,
+              resolvedBy: "Simón Ottati",
+              rejectionReason:
+                status === "rechazado"
+                  ? "El plan excede la política del consorcio"
+                  : undefined,
+            })
       return {
         id: `${building.id}-conv-${owner.id}`,
         ownerId: owner.id,
@@ -233,14 +304,7 @@ function buildConversations() {
           interestWaiver: building.policy.interestWaiver,
           buildingName: building.name,
         }),
-        agreement: guion.withAgreement
-          ? buildAgreement({
-              debt: owner.debt,
-              maxInstallments: building.policy.maxInstallments,
-              interestWaiver: building.policy.interestWaiver,
-              dueDay: building.policy.dueDay,
-            })
-          : undefined,
+        agreement,
       }
     })
     building.conversations = convs

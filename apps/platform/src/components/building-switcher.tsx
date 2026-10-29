@@ -17,8 +17,13 @@ import {
 import { cn } from "@/lib/utils"
 
 export function BuildingSwitcher() {
-  const { buildings, selectedBuilding, isAllBuildings, setSelectedBuildingId } =
-    useAppStore()
+  const {
+    buildings,
+    selectedBuilding,
+    isAllBuildings,
+    setSelectedBuildingId,
+    labels,
+  } = useAppStore()
   const { state, isMobile } = useSidebar()
   const collapsed = state === "collapsed" && !isMobile
 
@@ -47,8 +52,8 @@ export function BuildingSwitcher() {
               </span>
               <span className="block truncate text-xs text-muted-foreground">
                 {isAllBuildings
-                  ? `${buildings.length} edificios · consolidado`
-                  : `${selectedBuilding.units} unidades · mora ${selectedBuilding.metrics.delinquencyRate.toLocaleString(
+                  ? `${buildings.length} ${labels.entityPlural} · consolidado`
+                  : `${selectedBuilding.units} ${labels.unitShort} · mora ${selectedBuilding.metrics.delinquencyRate.toLocaleString(
                       "es-AR",
                       { maximumFractionDigits: 1 }
                     )}%`}
@@ -91,10 +96,10 @@ export function BuildingSwitcher() {
                   </span>
                   <span className="min-w-0 flex-1 leading-tight">
                     <span className="block truncate font-medium">
-                      Todos los edificios
+                      {labels.allEntities}
                     </span>
                     <span className="block truncate text-xs text-muted-foreground">
-                      Vista consolidada · {buildings.length} edificios
+                      Vista consolidada · {buildings.length} {labels.entityPlural}
                     </span>
                   </span>
                   {isAllBuildings && (
@@ -107,7 +112,10 @@ export function BuildingSwitcher() {
                 </Menu.Item>
 
                 <div className="mt-1 border-t px-2 pt-2 pb-1.5 text-xs font-medium text-muted-foreground">
-                  Edificios administrados
+                  {labels.entityPluralCapital} administrad
+                  {labels.entity === "institución" || labels.entity === "sucursal"
+                    ? "as"
+                    : "os"}
                 </div>
                 {buildings.map((building) => {
                   const isActive = building.id === selectedBuilding.id
@@ -138,7 +146,7 @@ export function BuildingSwitcher() {
                             "es-AR",
                             { maximumFractionDigits: 1 }
                           )}
-                          % · {building.units} u.
+                          % · {building.units} {labels.unitShort}
                         </span>
                       </span>
                       {isActive && (
